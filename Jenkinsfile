@@ -1,83 +1,68 @@
 pipeline {
-    agent any
-
-    stages {
-
-        stage('Initial Cleanup') {
-            steps {
-            dir("${WORKSPACE}") {
-              deleteDir()
-                }
-            }
-        }
-
-        stage ('Checkout Repo'){
-            steps {
-
-                git branch: 'main', url: 'https://gitlab.com/Kingkellee/php-todo'
-            }
-        }
-
-        stage ('Build Docker Image') {
-            steps {
-                script {
-
-                       sh "docker build -t kingkellee/php-todo:${env.BRANCH_NAME}-${env.BUILD_NUMBER} ."
-                }
-            }
-        }
-
-        stage ('Run Container') {
-            steps {
-                script {
-
-                       sh "docker run --network php -p 8090:8000 -d kingkellee/php-todo:${env.BRANCH_NAME}-${env.BUILD_NUMBER} ."
-                }
-            }
-        }
-
-        stage ('Test-Stage-Curl') {
-            steps {
-                script {
-
-                    sh "curl --version"
-                    sh  "curl -I http://localhost:8090"
-                }
-            }
-        }
-
-
-        stage ('Push Docker Image') {
-            steps{
-                script {
-            sh "docker login -u ${env.username} -p ${env.password}"
-
-            sh "docker push kingkellee/php-todo:${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
-                }
-            }
-        }
-
-
-        stage ('Clean Up') {
-            steps{
-                script {
-
-            sh "docker system prune -af"
-
-                }
-            }
-        }
-
-
-        stage ('logout Docker') {
-            steps {
-                script {
-
-                    sh "docker logout"
-
-                }
-            }
-        }
-
+    environment {
+        registry = "kingkellee/php-todo"
+        registryCredential = 'dockerhub_id'
+        dockerImage = ''
     }
+    agent any
+        stages {
+            stage("Workspace Cleanup") {
+                steps {
+                    dir("${WORKSPACE}") {
+                        deleteDir()
+                    }
+                }
+            }            
+                
+            stage ('Checkout Repo'){
+                steps {
+
+                    git branch: 'main', url: 'https://gitlab.com/Kingkellee/php-todo'
+                }
+            }
+
+            stage('Building Docker image') {
+                steps{
+                    script {
+                    dockerImage = docker.build registry + :${env.BRANCH_NAME}-${env.BUILD_NUMBER}
+                }
+            }
+            }
+                
+            stage ('Run Container') {
+                steps {
+                    script {
+
+                        sh "docker run --network php -p 8050:8000 -d  $registry:${env.BRANCH_NAME}-${env.BUILD_NUMBER} ."
+                    }
+                }
+            }
+
+            stage ('Test-Stage-Curl') {
+                steps {
+                    script {
+
+                        sh "curl --version"
+                        sh  "curl -I http://3.95.65.147:8050"
+                    }
+                }
+            }
+
+
+            stage('Deploy our image') {
+                steps{
+                    script {
+                            docker.withRegistry( '', registryCredential ) {
+                            dockerImage.push()
+                        }
+                    }   
+                }
+            }
+
+            stage('Cleaning up') {
+                steps{
+                    sh "docker rmi $registry:$BUILD_NUMBER"
+                }
+            }
+        }
 }
