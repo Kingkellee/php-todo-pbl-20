@@ -1,10 +1,10 @@
 pipeline {
-    environment {
-        registry = "kingkellee/php-todo"
-        registryCredential = 'dockerhub_id'
-        dockerImage = ''
-    }
     agent any
+        environment {
+            registry = "kingkellee/php-todo"
+            registryCredential = 'dockerhub_id'
+            dockerImage = ''
+        }
         stages {
             stage("Workspace Cleanup") {
                 steps {
