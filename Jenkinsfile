@@ -31,7 +31,7 @@ pipeline {
             steps {
                 script {
 
-                       sh "docker run --network php -p 8090:8000 -d kingkellee/php-todo:${env.BRANCH_NAME}-${env.BUILD_NUMBER} ."
+                       sh "docker run --network php -p 8089:8000 -d kingkellee/php-todo:${env.BRANCH_NAME}-${env.BUILD_NUMBER} ."
                 }
             }
         }
