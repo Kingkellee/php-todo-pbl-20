@@ -14,7 +14,7 @@ pipeline {
         stage ('Checkout Repo'){
             steps {
 
-                git branch: 'main', url: 'https://gitlab.com/Kingkellee/php-todo'
+                git branch: 'main', url: 'https://github.com/Kingkellee/php-todo-pbl-20.git'
             }
         }
 
