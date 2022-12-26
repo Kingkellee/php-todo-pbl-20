@@ -17,14 +17,14 @@ pipeline {
             stage ('Checkout Repo'){
                 steps {
 
-                    git branch: 'main', url: 'https://gitlab.com/Kingkellee/php-todo'
+                    git branch: 'main', url: 'https://github.com/Kingkellee/php-todo-pbl-20.git'
                 }
             }
 
             stage('Building Docker image') {
                 steps{
                     script {
-                    dockerImage = docker.build registry + :${env.BRANCH_NAME}-${env.BUILD_NUMBER}
+                    dockerImage = docker.build registry +  :"$BRANCH_NAME-$BUILD_NUMBER"
                 }
             }
             }
@@ -33,7 +33,7 @@ pipeline {
                 steps {
                     script {
 
-                        sh "docker run --network php -p 8050:8000 -d  $registry:${env.BRANCH_NAME}-${env.BUILD_NUMBER} ."
+                        sh "docker run --network php -p 8050:8000 -d  $registry:$BRANCH_NAME-$BUILD_NUMBER"
                     }
                 }
             }
@@ -43,7 +43,7 @@ pipeline {
                     script {
 
                         sh "curl --version"
-                        sh  "curl -I http://3.95.65.147:8050"
+                        sh  "curl -I http://localhost:8050"
                     }
                 }
             }
