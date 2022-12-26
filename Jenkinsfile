@@ -22,7 +22,7 @@ pipeline {
             steps {
                 script {
 
-                       sh "docker build -t kingkellee/php-todo:${env.BRANCH_NAME}-${env.BUILD_NUMBER} ."
+                       sh "sudo docker build -t kingkellee/php-todo:${env.BRANCH_NAME}-${env.BUILD_NUMBER} ."
                 }
             }
         }
@@ -31,7 +31,7 @@ pipeline {
             steps {
                 script {
 
-                       sh "docker run --network php -p 8090:8000 -d kingkellee/php-todo:${env.BRANCH_NAME}-${env.BUILD_NUMBER} ."
+                       sh "sudo docker run --network php -p 8090:8000 -d kingkellee/php-todo:${env.BRANCH_NAME}-${env.BUILD_NUMBER} ."
                 }
             }
         }
@@ -52,7 +52,7 @@ pipeline {
                 script {
             sh "docker login -u ${env.username} -p ${env.password}"
 
-            sh "docker push kingkellee/php-todo:${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
+            sh "sudo docker push kingkellee/php-todo:${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
                 }
             }
         }
@@ -62,7 +62,7 @@ pipeline {
             steps{
                 script {
 
-            sh "docker system prune -af"
+            sh "sudo docker system prune -af"
 
                 }
             }
@@ -73,7 +73,7 @@ pipeline {
             steps {
                 script {
 
-                    sh "docker logout"
+                    sh "sudo docker logout"
 
                 }
             }
